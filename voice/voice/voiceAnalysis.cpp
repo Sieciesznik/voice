@@ -3,7 +3,7 @@
 
 
 void runVoiceAnalysis(signed short* voice, size_t size, kiss_fft_cpx fftOut[N / 2 + 1]) {
-
+	
 	if (size == N) {
 		kissFFT(voice, fftOut);
 	}

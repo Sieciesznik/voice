@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +34,8 @@ extern "C" {
 #define KISS_FFT_FREE free
 #endif	
 
+//#define DATATYPE int16_t
+#define FIXED_POINT 16
 
 #ifdef FIXED_POINT
 #include <sys/types.h>	
