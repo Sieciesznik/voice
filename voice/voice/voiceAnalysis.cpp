@@ -2,9 +2,14 @@
 #include <iostream>
 
 
-void runVoiceAnalysis(signed short* voice, size_t size, kiss_fft_cpx fftOut[N / 2 + 1]) {
+void runVoiceAnalysis(signed short* voice, size_t size, kiss_fft_cpx fftOut[NFFT / 2 + 1]) {
 	
-	if (size == N) {
+	//this function has responsibility to make sure that input to fft is correct
+	//default size: 4096
+
+	if (size == NFFT) {
+		//signed short tempArray[NFFT];
+		//memcpy(tempArray, voice, sizeof(signed short) * NFFT);
 		kissFFT(voice, fftOut);
 	}
 	else {
@@ -13,13 +18,14 @@ void runVoiceAnalysis(signed short* voice, size_t size, kiss_fft_cpx fftOut[N / 
 
 }
 
-void kissFFT(const kiss_fft_scalar in[N], kiss_fft_cpx out[N / 2 + 1]) {
+void kissFFT(const kiss_fft_scalar in[NFFT], kiss_fft_cpx out[NFFT / 2 + 1]) {
 
 	kiss_fftr_cfg cfg;
 
-	if ((cfg = kiss_fftr_alloc(N, 0/*is_inverse_fft*/, NULL, NULL)) != NULL)
+	if ((cfg = kiss_fftr_alloc(NFFT, 0/*is_inverse_fft*/, NULL, NULL)) != NULL)
 	{
 		kiss_fftr(cfg, in, out);
 		free(cfg);
+		std::cout << "FFT!\n";
 	}
 }

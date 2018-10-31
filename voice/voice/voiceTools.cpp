@@ -8,15 +8,15 @@ void fft() {
 }
 
 bool VoiceRecorder::onStart() {
-	this->setProcessingInterval(sf::seconds(0.5));
+	//this->setProcessingInterval(sf::seconds(0.5));
 	return true;
 }
 
 bool VoiceRecorder::onProcessSamples(const sf::Int16* samples, std::size_t sampleCount) 
 {
 	commandBuffer.put(samples, sampleCount);
-	runVoiceAnalysis(commandBuffer.getBuffer(), commandBuffer.getSize(), fftOut);
-
+	//runVoiceAnalysis(commandBuffer.getFFTBuffer(), NFFT, fftOut);
+	runVoiceAnalysis(const_cast<signed short*>(samples), sampleCount, fftOut);
 	return true;
 }
 
@@ -27,8 +27,8 @@ void VoiceRecorder::onStop()
 	
 	if (myfile.is_open())
 	{
-		const sf::Int16* buff = commandBuffer.getBuffer();
-		for (uint32_t i = 0; i < commandBuffer.getSize(); ++i) {
+		const sf::Int16* buff = commandBuffer.getFFTBuffer();
+		for (uint32_t i = 0; i < NFFT; ++i) {
 			myfile << buff[i] << " ";
 		}
 
@@ -40,7 +40,7 @@ void VoiceRecorder::onStop()
 
 	if (myfile2.is_open())
 	{
-		for (uint32_t i = 0; i < N / 2 + 1; ++i) {
+		for (uint32_t i = 0; i < NFFT / 2 + 1; ++i) {
 			myfile2 << fftOut[i].r << " " << fftOut[i].i << std::endl;
 		}
 

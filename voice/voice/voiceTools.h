@@ -23,20 +23,25 @@ public:
 	}
 
 	void put(const T* array, std::size_t arraySize) {
-		if (pivot + arraySize <= size) {
-			memcpy(&buffer[pivot], array, sizeof(T) * arraySize);
+		if (pivot + 1 + arraySize <= size) {
+			memcpy(&buffer[pivot + 1], array, sizeof(T) * arraySize);
 			pivot += arraySize;
 		}
 		else {
-			memcpy(&buffer[pivot], array, sizeof(T) * (size - pivot));
+			memcpy(&buffer[pivot + 1], array, sizeof(T) * (size - pivot));
 			memcpy(&buffer, &array[size - pivot], sizeof(T) * (arraySize - (size - pivot)));
 			pivot = arraySize - (size - pivot);
 		}
 	}
 
-	T get(int32_t index) {
+	T get(uint32_t index) {
 		if (index >= size) return NULL;
 		return buffer[index];
+	}
+
+	T* getFFTBuffer() {
+		memcpy(&orderedArray[size - NFFT], &buffer[pivot], sizeof(T) * NFFT);
+		return &orderedArray[size - NFFT];
 	}
 
 	T* getBuffer() {
@@ -56,7 +61,7 @@ class VoiceRecorder : public sf::SoundRecorder
 {
 	cyclicBuffer<sf::Int16, N> commandBuffer;
 	sf::SoundBuffer buffer;
-	kiss_fft_cpx fftOut[N / 2 + 1];
+	kiss_fft_cpx fftOut[NFFT / 2 + 1];
 
 	virtual bool onStart(); // optional
 	virtual bool onProcessSamples(const sf::Int16* samples, std::size_t sampleCount);
