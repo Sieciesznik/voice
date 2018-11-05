@@ -8,7 +8,7 @@ void fft() {
 }
 
 bool VoiceRecorder::onStart() {
-	//this->setProcessingInterval(sf::seconds(0.5));
+	this->setProcessingInterval(sf::seconds(0.09));
 	return true;
 }
 
@@ -16,7 +16,7 @@ bool VoiceRecorder::onProcessSamples(const sf::Int16* samples, std::size_t sampl
 {
 	commandBuffer.put(samples, sampleCount);
 	//runVoiceAnalysis(commandBuffer.getFFTBuffer(), NFFT, fftOut);
-	runVoiceAnalysis(const_cast<signed short*>(samples), sampleCount, fftOut);
+	analyzer.runVoiceAnalysis(const_cast<signed short*>(samples), sampleCount);
 	return true;
 }
 
@@ -41,11 +41,24 @@ void VoiceRecorder::onStop()
 	if (myfile2.is_open())
 	{
 		for (uint32_t i = 0; i < NFFT / 2 + 1; ++i) {
-			myfile2 << fftOut[i].r << " " << fftOut[i].i << std::endl;
+			myfile2 << analyzer.frequencies.get(i) << " ";
 		}
 
 		myfile2.close();
 	}
+
+	std::ofstream myfile3;
+	myfile3.open("l.txt", std::ios::out);
+
+	if (myfile3.is_open())
+	{
+		for (uint32_t i = 0; i < 30; ++i) {
+			myfile3 << analyzer.loudness.get(i) << " ";
+		}
+
+		myfile3.close();
+	}
+
 }
 
 

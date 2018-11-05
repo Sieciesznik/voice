@@ -1,11 +1,22 @@
 #pragma once
+#include "cyclicbuff.cpp"
+
 extern "C"
 {
 #include "kiss_fftr.h"
 }
+#include <cstdlib>
 
-constexpr auto N = 44100*3;
+constexpr auto N = 44100 * 3;
 constexpr auto NFFT = 4096;
 
-void runVoiceAnalysis(signed short* voice, size_t size, kiss_fft_cpx fftOut[NFFT / 2 + 1]);
-void kissFFT(const kiss_fft_scalar in[NFFT], kiss_fft_cpx out[NFFT / 2 + 1]);
+class VoiceAnalyzer {
+public:
+	cyclicBuffer<int32_t, (NFFT / 2 + 1) * 30> frequencies;
+	cyclicBuffer<long, 30> loudness;
+
+	void runVoiceAnalysis(signed short* voice, size_t size);
+	void kissFFT(const kiss_fft_scalar in[NFFT]);
+
+	VoiceAnalyzer() :frequencies() {};
+};
