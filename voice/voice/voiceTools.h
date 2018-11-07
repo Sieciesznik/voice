@@ -14,5 +14,5 @@ class VoiceRecorder : public sf::SoundRecorder
 	virtual void onStop();
 public:
 	virtual sf::SoundBuffer getBuffer();
-	VoiceRecorder() : commandBuffer(), analyzer(){};
+	VoiceRecorder() : commandBuffer(0), analyzer(){};
 };

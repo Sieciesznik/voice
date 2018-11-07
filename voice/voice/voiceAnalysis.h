@@ -1,4 +1,5 @@
 #pragma once
+
 #include "cyclicbuff.cpp"
 
 extern "C"
@@ -7,16 +8,18 @@ extern "C"
 }
 #include <cstdlib>
 
-constexpr auto N = 44100 * 3;
-constexpr auto NFFT = 4096;
+struct SampleData {
+
+	kiss_fft_cpx freqs[NFFT / 2 + 1];
+	long loudness;
+};
 
 class VoiceAnalyzer {
 public:
-	cyclicBuffer<int32_t, (NFFT / 2 + 1) * 30> frequencies;
-	cyclicBuffer<long, 30> loudness;
+	cyclicBuffer<SampleData, 30> samples;
 
 	void runVoiceAnalysis(signed short* voice, size_t size);
 	void kissFFT(const kiss_fft_scalar in[NFFT]);
 
-	VoiceAnalyzer() :frequencies() {};
+	VoiceAnalyzer() :samples(SampleData()) {};
 };

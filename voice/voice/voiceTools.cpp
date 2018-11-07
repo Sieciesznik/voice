@@ -40,8 +40,9 @@ void VoiceRecorder::onStop()
 
 	if (myfile2.is_open())
 	{
+		kiss_fft_cpx *freqs = analyzer.samples.get(15)->freqs;
 		for (uint32_t i = 0; i < NFFT / 2 + 1; ++i) {
-			myfile2 << analyzer.frequencies.get(i) << " ";
+			myfile2 << (freqs[i].i * freqs[i].i) + (freqs[i].r * freqs[i].r) << " ";
 		}
 
 		myfile2.close();
@@ -53,7 +54,7 @@ void VoiceRecorder::onStop()
 	if (myfile3.is_open())
 	{
 		for (uint32_t i = 0; i < 30; ++i) {
-			myfile3 << analyzer.loudness.get(i) << " ";
+			myfile3 << analyzer.samples.get(i)->loudness << " ";
 		}
 
 		myfile3.close();
