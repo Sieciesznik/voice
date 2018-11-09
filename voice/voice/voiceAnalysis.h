@@ -20,6 +20,7 @@ public:
 
 	void runVoiceAnalysis(signed short* voice, size_t size);
 	void kissFFT(const kiss_fft_scalar in[NFFT]);
+	void displayFFT();
 
 	VoiceAnalyzer() :samples(SampleData()) {};
 };

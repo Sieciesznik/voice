@@ -31,7 +31,6 @@ int main() {
 	sound.setBuffer(buffer);
 	sound.play();
 	*/
-	cout << "zamknij";
 	getchar();
 	recorder.stop();
 	return 0;

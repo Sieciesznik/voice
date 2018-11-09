@@ -17,6 +17,8 @@ bool VoiceRecorder::onProcessSamples(const sf::Int16* samples, std::size_t sampl
 	commandBuffer.put(samples, sampleCount);
 	//runVoiceAnalysis(commandBuffer.getFFTBuffer(), NFFT, fftOut);
 	analyzer.runVoiceAnalysis(const_cast<signed short*>(samples), sampleCount);
+	analyzer.displayFFT();
+
 	return true;
 }
 
