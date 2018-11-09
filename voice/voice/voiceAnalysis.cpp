@@ -6,7 +6,7 @@ void VoiceAnalyzer::runVoiceAnalysis(signed short* voice, size_t size) {
 	//this function has responsibility to make sure that input to fft is correct
 	//default size: 4096
 
-	if (size <= NFFT) {
+	if (true/*size <= NFFT*/) {
 
 		kissFFT(voice);
 
@@ -15,13 +15,25 @@ void VoiceAnalyzer::runVoiceAnalysis(signed short* voice, size_t size) {
 		for (uint32_t i = 0; i < size; ++i) {
 			acc += voice[i] > 0 ? voice[i] : -voice[i];
 		}
-		samples.getLast()->loudness = acc / size;
-		//std::cout << acc << "\tAcc " << acc / size << "\tL" << std::endl;
+
+		long newAvg = acc / size;
+
+		samples.getLast()->loudness = newAvg;
+		updateAverageL(newAvg);
+		isCommand.put(newAvg > (averageLoudness));
+
+		for (int i = 29; i > 0; --i) {
+			if (*isCommand.show(i))
+				std::cout << "\xdb";
+			else
+				std::cout << " ";
+		}
+		std::cout << averageLoudness << "\r";
 	}
 	else {
 		std::cerr << "runVoiceAnalysis sie zjebalo " << size << std::endl;
-
 	}
+
 
 }
 
@@ -41,4 +53,10 @@ void VoiceAnalyzer::kissFFT(const kiss_fft_scalar in[NFFT]) {
 
 		//std::cout << "FFT!\n";
 	}
+}
+
+void VoiceAnalyzer::updateAverageL(long newValue) {
+
+	averageLoudness = (averageLoudness * averageSize + newValue) / (averageSize + 1);
+	++averageSize;
 }
