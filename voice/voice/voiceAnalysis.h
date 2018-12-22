@@ -21,11 +21,12 @@ public:
 
 	cyclicBuffer<SampleData, 30> samples;
 	cyclicBuffer<bool, 30> isCommand;
+	cyclicBuffer<long, 60> ambientNoise;
 
 	void runVoiceAnalysis(signed short* voice, size_t size);
 	void kissFFT(const kiss_fft_scalar in[NFFT]);
-	void updateAverageL(long newValue);
+	void updateAverageL();
 	
 
-	VoiceAnalyzer() :samples(SampleData()), isCommand(false) {};
+	VoiceAnalyzer() :samples(SampleData()), isCommand(false), ambientNoise(100) {};
 };

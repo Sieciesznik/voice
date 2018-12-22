@@ -19,16 +19,19 @@ void VoiceAnalyzer::runVoiceAnalysis(signed short* voice, size_t size) {
 		long newAvg = acc / size;
 
 		samples.getLast()->loudness = newAvg;
-		updateAverageL(newAvg);
-		isCommand.put(newAvg > (averageLoudness));
+		ambientNoise.put(newAvg);
+		updateAverageL();
+		isCommand.put(newAvg > (averageLoudness * 1.2));
 
-		for (int i = 29; i > 0; --i) {
-			if (*isCommand.show(i))
+		bool* commands = isCommand.getBuffer();
+
+		for (int i = isCommand.getSize() - 1; i >= 0; --i) {
+			if (commands[i])
 				std::cout << "\xdb";
 			else
 				std::cout << " ";
 		}
-		std::cout << averageLoudness << "\r";
+		std::cout << averageLoudness << "      \r";
 	}
 	else {
 		std::cerr << "runVoiceAnalysis sie zjebalo " << size << std::endl;
@@ -43,20 +46,28 @@ void VoiceAnalyzer::kissFFT(const kiss_fft_scalar in[NFFT]) {
 
 	if ((cfg = kiss_fftr_alloc(NFFT, 0/*is_inverse_fft*/, NULL, NULL)) != NULL)
 	{
-		kiss_fftr(cfg, in, samples.getNext()->freqs);
+		kiss_fftr(cfg, in, samples.getNext()->freqs); //getNext() returns pointer to next bucket
 		free(cfg);
-/*
+		
+		/*
 		for (uint32_t i = 0; i < NFFT / 2 + 1; ++i) {
 			outr[i] = out[i].r * out[i].r + out[i].i * out[i].i;
 		}*/
-		samples.put();
 
-		//std::cout << "FFT!\n";
+		samples.put();	//blank put() sets pivot in correct place
+
 	}
 }
 
-void VoiceAnalyzer::updateAverageL(long newValue) {
+void VoiceAnalyzer::updateAverageL() {
 
-	averageLoudness = (averageLoudness * averageSize + newValue) / (averageSize + 1);
-	++averageSize;
+	averageLoudness = 0;
+	long* ambient = ambientNoise.getBuffer();
+	for (uint32_t i = 0; i < ambientNoise.getSize(); ++i) {
+		averageLoudness += ambient[i];
+	}
+	averageLoudness /= ambientNoise.getSize();
+
+	//averageLoudness = (averageLoudness * averageSize + newValue) / (averageSize + 1);
+	//++averageSize;
 }
